@@ -1,0 +1,28 @@
+from arvore_binaria import Arvore
+
+
+arvore = Arvore()
+arvore.add(4)
+# arvore.add(1)
+# arvore.add(3)
+# arvore.add(2)
+# arvore.add(6)
+# arvore.add(5)
+# arvore.add(7)
+# arvore.add(0)
+# arvore.add(9)
+# arvore.add(-1)
+# arvore.add(3)
+# arvore.add(2)
+# # arvore.remover(4)
+# # arvore.pre_ordem()
+# # print(arvore.tamanho())
+# # print(arvore.tamanho())
+arvore.pre_ordem()
+arvore.remover(4)
+# # print(arvore.folhas())
+arvore.pre_ordem()
+# arvore.ordem()
+# arvore.exibir_arvore()
+# print(arvore.minimo().valor)
+
