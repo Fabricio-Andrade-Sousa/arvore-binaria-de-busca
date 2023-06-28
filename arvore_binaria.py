@@ -1,18 +1,18 @@
 from no import No
-from time import sleep
 import tkinter as tk
+from tkinter import font, IntVar
 
 class Arvore:
 
     def __init__(self, valor=None) -> None:
 
-        self.raiz = No(valor)
+        self.raiz = None #No(valor)
 
 
     def add(self, valor):
 
-        if self.raiz.valor == None:
-            self.raiz.valor = valor
+        if self.raiz == None:
+            self.raiz = No(valor)
         else:
             no = No(valor)
             comp_raiz = self.raiz
@@ -101,9 +101,6 @@ class Arvore:
 
         if raiz == None:
             raiz = self.raiz 
-
-        if raiz == None:
-            return raiz
         
         if valor < raiz.valor:
             raiz.esquerda =  self.remover(valor,raiz.esquerda)
@@ -112,15 +109,25 @@ class Arvore:
         else:
             
             if raiz.esquerda == None and raiz.direita == None:
+                if raiz == self.raiz:
+                    self.raiz = None
                 return None
+            
             elif raiz.esquerda != None and raiz.direita == None:
+                if raiz == self.raiz:
+                    self.raiz = raiz.esquerda
                 return raiz.esquerda
+            
             elif raiz.esquerda == None and raiz.direita != None:
+                if raiz == self.raiz:
+                    self.raiz = raiz.direita
                 return raiz.direita
+            
             else:
                 menor = self.menor(raiz.direita)
                 raiz.valor = menor.valor
                 raiz.direita = self.remover(menor.valor,raiz.direita)
+                
         return raiz
             
 
@@ -152,43 +159,67 @@ class Arvore:
 
         if raiz == None:
             raiz = self.raiz
+
+        if folhas is None:
             folhas = list()
 
+        if raiz != None:
+            if raiz.esquerda is None and raiz.direita is None:
+                folhas.append(raiz)
+
+            if raiz.esquerda != None:
+                self.folhas(raiz.esquerda,folhas)
+
+            if raiz.direita != None:
+                self.folhas(raiz.direita,folhas)
+
         
-        if raiz.esquerda is None and raiz.direita is None:
-            folhas.append(raiz)
+        return folhas
 
-        if raiz.esquerda != None:
-            self.folhas(raiz.esquerda,folhas)
-
-        if raiz.direita != None:
-            self.folhas(raiz.direita,folhas)
-            return folhas
-
-    def tamanho(self,folhas = None):
+    def tamanho(self,folhas = None,raiz_balancear = None):
         
         if folhas is None:
+            
             folhas = self.folhas()
-
 
             
         tamanho  = 0
-        if folhas != None:
+        
+        if folhas != None and len(folhas) != 0:
             for folha in folhas:
-                cont = 0 
+                cont = 1
                 raiz = self.raiz
+                if raiz_balancear != None:
+                    raiz = raiz_balancear
                 while raiz != folha:
+
+                    cont += 1
                     
                     if folha.valor >= raiz.valor:
                         raiz = raiz.direita
                     elif folha.valor < raiz.valor:
                         raiz = raiz.esquerda 
-                    cont += 1
                 if cont > tamanho:
                     tamanho = cont
         
         return tamanho
 
+    def balancear(self,raiz):
+        
+        tamanho_esquerda = 0 
+        tamanho_direita = 0 
+        if raiz.esquerda != None:
+            tamanho_esquerda = self.tamanho(raiz_balancear=raiz.esquerda)
+        if raiz.direita != None:
+            tamanho_direita = self.tamanho(raiz_balancear=raiz.direita)
+
+        fator = tamanho_esquerda - tamanho_direita
+        # if fator > 1:
+
+
+
+
+        print(fator)
 
 
     def exibir_arvore(self,raiz = None):
@@ -199,24 +230,22 @@ class Arvore:
             self.add(valor)
             canvas.delete("all")
             raiz = self.raiz
+            informacoes()
             desenhar_no(raiz, 400, 50, 200, 100)
-            informações()
+
         def remover_arvore():
 
             valor = int(caixa_entrada.get())
-            print(valor)
             self.remover(valor)
             canvas.delete("all")
             raiz = self.raiz
+            informacoes()
             desenhar_no(raiz, 400, 50, 200, 100)
-            informações()
 
-
-        def informações():
-            label1 = tk.Label(janela, text='Árvore binária de busca',font=16).pack()
-            altura = tk.Label(janela, text=f'A altura da Arvore: {str(self.tamanho())}',font=14).pack()
-            maior = tk.Label(janela,text=f'Maior valor da Arvore: {str(self.maior().valor)}',font = 14).pack()
-            menor = tk.Label(janela,text=f'Menor valor da Arvore: {str(self.menor().valor)}',font = 14 ).pack()
+        def informacoes():
+            altura_var.set(self.tamanho())
+            maior_var.set(self.maior().valor)
+            menor_var.set(self.menor().valor)
 
 
 
@@ -224,36 +253,54 @@ class Arvore:
         # Função auxiliar para desenhar os nós da árvore
         
         def desenhar_no(no, x, y, dx, dy):
-            raio = 20
+            raio = 18
             cor = "white"
             if no is not None:
-                canvas.create_oval(x - raio, y - raio, x + raio, y + raio, fill=cor)
-                canvas.create_text(x, y, text=str(no.valor))
+                espessura_borda = 2
+                canvas.create_oval(x - raio, y - raio, x + raio, y + raio, fill=cor,width=espessura_borda)
+                canvas.create_text(x, y, text=str(no.valor),font='bold')
                 if no.esquerda:
-                    canvas.create_line(x, y + raio, x - dx, y + dy - raio)
+                    canvas.create_line(x, y + raio, x - dx, y + dy - raio,width=2)
                     desenhar_no(no.esquerda, x - dx, y + dy, dx/2, dy)
                 if no.direita:
-                    canvas.create_line(x, y + raio, x + dx, y + dy - raio)
+                    canvas.create_line(x, y + raio, x + dx, y + dy - raio,width=2)
                     desenhar_no(no.direita, x + dx, y + dy, dx/2, dy)
-            return
 
 
         if raiz is None:
             raiz = self.raiz
         janela = tk.Tk()
-        caixa_entrada = tk.Entry(janela)
-        caixa_entrada.pack()
-        adicionar = tk.Button(janela,text='Adcionar',command=adicionar_arvore).pack()
-        remover = tk.Button(janela,text='Remover',command=remover_arvore).pack()
+        janela.configure(bg='#3d3334')
+        font_grande = font.Font(size = 16)
+        font_padrao = font.Font(size = 15)
+        altura_var = IntVar()
+        maior_var = IntVar()
+        menor_var = IntVar()
+        altura_var.set(0)
+        maior_var.set(0)
+        menor_var.set(0)
+
+        titulo = tk.Label(janela, text='Árvore binária de busca',font=font_grande,fg='white',bg='#3d3334').pack(side='top')
+    # Criação da janela e do canvas
+        canvas = tk.Canvas(janela, width=800, height=600,bg="#386dbd")
+        canvas.pack(side='top')
+
+        tex1 = tk.Label(janela,text='Altura da árvore: ',bg="#386dbd",font=font_padrao,fg="white").place(x=10,y=50)
+        altura = tk.Label(janela, textvariable=altura_var,bg="#386dbd",font=font_padrao,fg="white").place(x=160,y=50)
+        tex2 = tk.Label(janela,text='Maior valor: ',bg="#386dbd",font=font_padrao,fg="white").place(x=10, y = 80)
+        maior = tk.Label(janela,textvariable= maior_var,bg="#386dbd",font=font_padrao,fg="white").place(x=130, y = 80)
+        tex3 = tk.Label(janela,text='Menor valor: ',bg="#386dbd",font=font_padrao,fg="white").place(x=10,y=110)
+        menor = tk.Label(janela,textvariable=menor_var,bg="#386dbd",font=font_padrao,fg="white").place(x=130,y=110)
+
+        # informacoes()
+        remover = tk.Button(janela,text='Remover',command=remover_arvore,bg='red',fg='white').place(x=10,y=600)
+        adicionar = tk.Button(janela,text='Adcionar',command=adicionar_arvore,bg='green',fg='white').place(x=75,y=600)
+        caixa_entrada = tk.Entry(janela,bg='white')
+        caixa_entrada.place(x=10,y=570)
+        # caixa_entrada.place(x=50,y=50)
 
 
 
-        canvas = tk.Canvas(janela, width=800, height=600)
-        canvas.pack()
-        # Criação da janela e do canvas
-
-
-        informações()
 
     # Desenhar a árvore
         desenhar_no(raiz, 400, 50, 200, 100)
