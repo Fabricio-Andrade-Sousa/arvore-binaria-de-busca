@@ -4,3 +4,4 @@ class No:
         self.valor = valor
         self.direita = None
         self.esquerda = None
+        self.fator = 0
