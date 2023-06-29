@@ -55,47 +55,32 @@ class Arvore:
     def ordem(self, raiz=None):
 
         if raiz == None:
-
-            print('Em Ordem:', end=" ")
+            print('Em Ordem:', end=' ')
             raiz = self.raiz
 
-        if raiz.esquerda == None:
-
-            print(raiz.valor, end=" ")
-
         if raiz.esquerda != None:
-
             self.ordem(raiz.esquerda)
-
-        if raiz.esquerda != None:
-
-            print(raiz.valor, end=" ")
+        
+        print(raiz.valor,end=' ')
 
         if raiz.direita != None:
-
             self.ordem(raiz.direita)
 
     def pos_ordem(self, raiz=None):
 
         if raiz == None:
-            print('Pos-Ordem:', end=' ')
+            # print('Pos-Ordem:', end=' ')
             raiz = self.raiz
-
-        if (raiz.esquerda == None and raiz.direita == None):
-            print(raiz.valor, end=' ')
 
         if raiz.esquerda != None:
             self.pos_ordem(raiz.esquerda)
-
+        
         if raiz.direita != None:
             self.pos_ordem(raiz.direita)
 
-        if raiz.direita != None and raiz.esquerda != None:
-            print(raiz.valor, end=' ')
-        elif raiz.esquerda == None and raiz.direita != None:
-            print(raiz.valor, end=' ')
-        if raiz.esquerda != None and raiz.direita == None:
-            print(raiz.valor, end=' ')
+        self.balancear(raiz)
+        # print(raiz.valor,end=' ')
+       
 
     def remover(self,valor,raiz = None):
 
@@ -178,34 +163,41 @@ class Arvore:
 
     def tamanho(self,folhas = None,raiz_balancear = None):
         
+        if raiz_balancear != None:
+            raiz = raiz_balancear
         if folhas is None:
             
-            folhas = self.folhas()
+            folhas = self.folhas(raiz_balancear)
 
             
         tamanho  = 0
-        
-        if folhas != None and len(folhas) != 0:
+        # print(folhas[0].valor)
+        # print(folhas[1].valor)
+        # print('raiz: ',raiz.valor)
+        # print('folhas: ', folhas)
+        if len(folhas) != 0:
             for folha in folhas:
                 cont = 1
-                raiz = self.raiz
-                if raiz_balancear != None:
-                    raiz = raiz_balancear
-                while raiz != folha:
+                # print('folha: ',folha.valor)
+                if raiz_balancear == None:
+                    raiz = self.raiz
+                # print('raiz: ',raiz.valor,'folha: ',folha.valor)
+                procurar = raiz
+                while procurar != folha:
 
                     cont += 1
                     
-                    if folha.valor >= raiz.valor:
-                        raiz = raiz.direita
-                    elif folha.valor < raiz.valor:
-                        raiz = raiz.esquerda 
+                    if folha.valor >= procurar.valor:
+                        procurar = procurar.direita
+                    elif folha.valor < procurar.valor:
+                        procurar = procurar.esquerda 
                 if cont > tamanho:
                     tamanho = cont
         
         return tamanho
 
     def balancear(self,raiz):
-        
+        print('raiz: ',raiz.valor,end=' ')
         tamanho_esquerda = 0 
         tamanho_direita = 0 
         if raiz.esquerda != None:
@@ -213,13 +205,13 @@ class Arvore:
         if raiz.direita != None:
             tamanho_direita = self.tamanho(raiz_balancear=raiz.direita)
 
-        fator = tamanho_esquerda - tamanho_direita
-        # if fator > 1:
+        raiz.fator = tamanho_esquerda - tamanho_direita
+        
 
 
 
 
-        print(fator)
+        print('fator: ',raiz.fator)
 
 
     def exibir_arvore(self,raiz = None):
