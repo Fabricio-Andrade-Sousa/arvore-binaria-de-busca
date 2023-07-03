@@ -20,28 +20,29 @@ class Arvore:
         # adicionar elemento em uma arvore que não está vazia
         else:
             no = No(valor)
-            comp_raiz = self.raiz
-            comp_raiz = self.procurar_add(no.valor, comp_raiz)
+            raiz = self.raiz
+            raiz = self.procurar_add(no.valor, raiz)
 
-            if no.valor < comp_raiz.valor:
-                comp_raiz.esquerda = no
+            if no.valor < raiz.valor:
+                raiz.esquerda = no
             else:
-                comp_raiz.direita = no
-        self.adquirir_fator()
+                raiz.direita = no
+
+        self.pecorrer_balancear()
 
     # procura o nó que será adicionado o novo elemento
-    def procurar_add(self, valor, comp_raiz=None):
+    def procurar_add(self, valor, raiz=None):
 
-        if valor < comp_raiz.valor:
+        if valor < raiz.valor:
 
-            if comp_raiz.esquerda != None:
+            if raiz.esquerda != None:
 
-                comp_raiz = self.procurar_add(valor, comp_raiz.esquerda)
+                raiz = self.procurar_add(valor, raiz.esquerda)
         else:
-            if comp_raiz.direita != None:
-                comp_raiz = self.procurar_add(valor, comp_raiz.direita)
+            if raiz.direita != None:
+                raiz = self.procurar_add(valor, raiz.direita)
 
-        return comp_raiz
+        return raiz
 
     # procura a sub-arvore para apagar ate encontrar o valor que quer apagar
 
@@ -82,7 +83,7 @@ class Arvore:
                 raiz.valor = menor.valor
                 raiz.direita = self.remover(menor.valor, raiz.direita)
 
-        self.adquirir_fator()
+        self.pecorrer_balancear()
         return raiz
 
     def pre_ordem(self, raiz=None):
@@ -112,17 +113,17 @@ class Arvore:
         if raiz.direita != None:
             self.ordem(raiz.direita)
 
-    def adquirir_fator(self, raiz=None):
+    def pecorrer_balancear(self, raiz=None):
 
         if raiz == None:
 
             raiz = self.raiz
 
         if raiz.esquerda != None:
-            self.adquirir_fator(raiz.esquerda)
+            self.pecorrer_balancear(raiz.esquerda)
 
         if raiz.direita != None:
-            self.adquirir_fator(raiz.direita)
+            self.pecorrer_balancear(raiz.direita)
 
         self.balancear(raiz)
 
@@ -147,59 +148,105 @@ class Arvore:
 
         if raiz.direita == None:
             return raiz
-
-    def folhas(self, raiz=None, folhas=None):
+        
+    def quantidade_no(self,raiz = None,cont = 1):
 
         if raiz == None:
             raiz = self.raiz
 
-        if folhas is None:
-            folhas = list()
+        if raiz.esquerda != None:
+            cont += 1
+            cont = self.quantidade_no(raiz.esquerda,cont)
 
-        if raiz != None:
-            if raiz.esquerda is None and raiz.direita is None:
-                folhas.append(raiz)
+        if raiz.direita != None:
+            cont += 1
+            cont = self.quantidade_no(raiz.direita,cont)
 
-            if raiz.esquerda != None:
-                self.folhas(raiz.esquerda, folhas)
+        return cont
+        
+    # def folhas(self, raiz=None, folhas=None):
 
-            if raiz.direita != None:
-                self.folhas(raiz.direita, folhas)
+    #     if raiz == None:
+    #         raiz = self.raiz
 
-        return folhas
+    #     if folhas is None:
+    #         folhas = list()
 
-    def tamanho(self, raiz_balancear=None):
+    #     if raiz != None:
+    #         if raiz.esquerda is None and raiz.direita is None:
+    #             folhas.append(raiz)
 
-        if raiz_balancear != None:
-            raiz = raiz_balancear
+    #         if raiz.esquerda != None:
+    #             self.folhas(raiz.esquerda, folhas)
 
-        folhas = self.folhas(raiz_balancear)
+    #         if raiz.direita != None:
+    #             self.folhas(raiz.direita, folhas)
 
-        tamanho = 0
+    #     return folhas
 
-        if len(folhas) != 0:
-            for folha in folhas:
-                cont = 1
+    # def tamanho(self, raiz_balancear=None):
 
-                if raiz_balancear == None:
-                    raiz = self.raiz
+    #     if raiz_balancear != None:
+    #         raiz = raiz_balancear
 
-                procurar = raiz
-                while procurar != folha:
+    #     folhas = self.folhas(raiz_balancear)
 
-                    cont += 1
+    #     tamanho = 0
 
-                    if folha.valor >= procurar.valor:
-                        procurar = procurar.direita
+    #     print(folhas)
+    #     for c in folhas:
+    #         print(c.valor)
 
-                    elif folha.valor < procurar.valor:
-                        procurar = procurar.esquerda
+    #     if len(folhas) != 0:
+    #         for folha in folhas:
+    #             cont = 1
 
-                if cont > tamanho:
-                    tamanho = cont
+    #             if raiz_balancear == None:
+    #                 raiz = self.raiz
 
-        return tamanho
+    #             procurar = raiz
+                
+    #             while procurar != folha:
 
+    #                 cont += 1
+
+    #                 if folha.valor >= procurar.valor:
+    #                     procurar = procurar.direita
+
+    #                 elif folha.valor < procurar.valor:
+    #                     procurar = procurar.esquerda
+
+    #             if cont > tamanho:
+    #                 tamanho = cont
+
+    #     return tamanho
+    
+    def altura(self, raiz = None, cont_esquerda = 0):
+        
+        if raiz == None:
+            raiz = self.raiz
+
+        if raiz.esquerda is None and raiz.direita is None: 
+            cont = 1
+            return cont
+
+        if raiz.esquerda is not None:
+
+            cont = self.altura(raiz.esquerda) + 1
+            cont_esquerda = cont
+
+        if raiz.direita is not None:
+            
+            cont = self.altura(raiz.direita,cont_esquerda) + 1
+
+        if cont_esquerda > cont :
+            return cont_esquerda
+            
+
+        return cont
+
+
+    
     def balancear(self, raiz):
 
         tamanho_esquerda = 0
@@ -207,32 +254,35 @@ class Arvore:
 
         if raiz.esquerda != None:
 
-            tamanho_esquerda = self.tamanho(raiz_balancear=raiz.esquerda)
+            tamanho_esquerda = self.altura(raiz.esquerda)
 
         if raiz.direita != None:
 
-            tamanho_direita = self.tamanho(raiz_balancear=raiz.direita)
+            tamanho_direita = self.altura(raiz.direita)
 
         raiz.fator = tamanho_esquerda - tamanho_direita
+
+
 
         if raiz.fator > 1 and raiz.esquerda.fator == 1:
 
             self.rotacao_direita(raiz)
 
-        elif raiz.fator < -1 and raiz.direita.fator <= 0:
+        elif raiz.fator < -1 and raiz.direita.fator == -1:
 
             self.rotacao_esquerda(raiz)
 
-        elif raiz.fator == 2 and raiz.esquerda.fator == -1:
+        elif raiz.fator == 2 and (raiz.esquerda.fator == -1 or raiz.esquerda.fator == 0):
 
             self.rotacao_esquerda(raiz.esquerda)
             self.rotacao_direita(raiz)
 
-        elif raiz.fator == -2 and raiz.direita.fator >= 0:
+        elif raiz.fator == -2 and (raiz.direita.fator == 1 or raiz.direita.fator == 0) :
 
             self.rotacao_direita(raiz.direita)
             self.rotacao_esquerda(raiz)
 
+        
     def rotacao_direita(self, raiz):
 
         raiz.valor, raiz.esquerda.valor = raiz.esquerda.valor, raiz.valor
@@ -275,9 +325,10 @@ class Arvore:
 
         def informacoes():
 
-            altura_var.set(self.tamanho())
+            altura_var.set(self.altura())
             maior_var.set(self.maior().valor)
             menor_var.set(self.menor().valor)
+            quantidade_var.set(self.quantidade_no())
 
         # Função auxiliar para desenhar os nós da árvore
 
@@ -289,7 +340,7 @@ class Arvore:
                 espessura_borda = 2
                 canvas.create_oval(x - raio, y - raio, x + raio,
                                    y + raio, fill=cor, width=espessura_borda)
-                canvas.create_text(x, y, text=str(no.valor), font='bold',)
+                canvas.create_text(x, y, text=(str(no.valor)), font='bold',)
                 if no.esquerda:
                     canvas.create_line(x, y + raio, x - dx,
                                        y + dy - raio, width=2)
@@ -310,9 +361,11 @@ class Arvore:
         altura_var = IntVar()
         maior_var = IntVar()
         menor_var = IntVar()
+        quantidade_var = IntVar()
         altura_var.set(0)
         maior_var.set(0)
         menor_var.set(0)
+        quantidade_var.set(0)
 
         titulo = tk.Label(janela, text='Árvore binária de busca balanceada',
                           font=font_grande, fg='white', bg='#3d3334').pack(side='top')
@@ -336,6 +389,10 @@ class Arvore:
                         font=font_padrao, fg="white").place(x=10, y=110)
         menor = tk.Label(janela, textvariable=menor_var, bg="#386dbd",
                          font=font_padrao, fg="white").place(x=130, y=110)
+        tex4 = tk.Label(janela, text='Quantidade de nó(s): ', bg="#386dbd",
+                        font=font_padrao, fg="white").place(x=10, y=140)
+        quantidade = tk.Label(janela, textvariable=quantidade_var, bg="#386dbd",
+                         font=font_padrao, fg="white").place(x=205, y=140)
 
         remover = tk.Button(janela, text='Remover', command=remover_arvore,
                             bg='red', fg='white', font=('Arial', 13), width=8).place(x=599, y=625)
