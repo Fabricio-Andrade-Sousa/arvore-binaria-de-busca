@@ -32,6 +32,8 @@ class Arvore:
 
     # procura o nó que será adicionado o novo elemento
     def procurar_add(self, valor, raiz=None):
+        if raiz == None:
+            raiz = self.raiz
 
         if valor < raiz.valor:
 
@@ -43,6 +45,21 @@ class Arvore:
                 raiz = self.procurar_add(valor, raiz.direita)
 
         return raiz
+
+    def procurar(self, valor, raiz=None):
+
+        if raiz == None:
+            raiz = self.raiz
+
+        if valor > raiz.valor:
+            if raiz.direita != None:
+                raiz = self.procurar(valor, raiz.direita)
+        elif valor < raiz.valor:
+            if raiz.esquerda != None:
+                raiz = self.procurar(valor, raiz.esquerda)
+
+        if valor == raiz.valor:
+            return raiz
 
     # procura a sub-arvore para apagar ate encontrar o valor que quer apagar
 
@@ -148,85 +165,28 @@ class Arvore:
 
         if raiz.direita == None:
             return raiz
-        
-    def quantidade_no(self,raiz = None,cont = 1):
+
+    def quantidade_no(self, raiz=None, cont=1):
 
         if raiz == None:
             raiz = self.raiz
 
         if raiz.esquerda != None:
             cont += 1
-            cont = self.quantidade_no(raiz.esquerda,cont)
+            cont = self.quantidade_no(raiz.esquerda, cont)
 
         if raiz.direita != None:
             cont += 1
-            cont = self.quantidade_no(raiz.direita,cont)
+            cont = self.quantidade_no(raiz.direita, cont)
 
         return cont
-        
-    # def folhas(self, raiz=None, folhas=None):
 
-    #     if raiz == None:
-    #         raiz = self.raiz
+    def altura(self, raiz=None, cont_esquerda=0):
 
-    #     if folhas is None:
-    #         folhas = list()
-
-    #     if raiz != None:
-    #         if raiz.esquerda is None and raiz.direita is None:
-    #             folhas.append(raiz)
-
-    #         if raiz.esquerda != None:
-    #             self.folhas(raiz.esquerda, folhas)
-
-    #         if raiz.direita != None:
-    #             self.folhas(raiz.direita, folhas)
-
-    #     return folhas
-
-    # def tamanho(self, raiz_balancear=None):
-
-    #     if raiz_balancear != None:
-    #         raiz = raiz_balancear
-
-    #     folhas = self.folhas(raiz_balancear)
-
-    #     tamanho = 0
-
-    #     print(folhas)
-    #     for c in folhas:
-    #         print(c.valor)
-
-    #     if len(folhas) != 0:
-    #         for folha in folhas:
-    #             cont = 1
-
-    #             if raiz_balancear == None:
-    #                 raiz = self.raiz
-
-    #             procurar = raiz
-                
-    #             while procurar != folha:
-
-    #                 cont += 1
-
-    #                 if folha.valor >= procurar.valor:
-    #                     procurar = procurar.direita
-
-    #                 elif folha.valor < procurar.valor:
-    #                     procurar = procurar.esquerda
-
-    #             if cont > tamanho:
-    #                 tamanho = cont
-
-    #     return tamanho
-    
-    def altura(self, raiz = None, cont_esquerda = 0):
-        
         if raiz == None:
             raiz = self.raiz
 
-        if raiz.esquerda is None and raiz.direita is None: 
+        if raiz.esquerda is None and raiz.direita is None:
             cont = 1
             return cont
 
@@ -236,17 +196,14 @@ class Arvore:
             cont_esquerda = cont
 
         if raiz.direita is not None:
-            
-            cont = self.altura(raiz.direita,cont_esquerda) + 1
 
-        if cont_esquerda > cont :
+            cont = self.altura(raiz.direita, cont_esquerda) + 1
+
+        if cont_esquerda > cont:
             return cont_esquerda
-            
 
         return cont
 
-
-    
     def balancear(self, raiz):
 
         tamanho_esquerda = 0
@@ -262,8 +219,6 @@ class Arvore:
 
         raiz.fator = tamanho_esquerda - tamanho_direita
 
-
-
         if raiz.fator > 1 and raiz.esquerda.fator == 1:
 
             self.rotacao_direita(raiz)
@@ -277,12 +232,11 @@ class Arvore:
             self.rotacao_esquerda(raiz.esquerda)
             self.rotacao_direita(raiz)
 
-        elif raiz.fator == -2 and (raiz.direita.fator == 1 or raiz.direita.fator == 0) :
+        elif raiz.fator == -2 and (raiz.direita.fator == 1 or raiz.direita.fator == 0):
 
             self.rotacao_direita(raiz.direita)
             self.rotacao_esquerda(raiz)
 
-        
     def rotacao_direita(self, raiz):
 
         raiz.valor, raiz.esquerda.valor = raiz.esquerda.valor, raiz.valor
@@ -330,33 +284,50 @@ class Arvore:
             menor_var.set(self.menor().valor)
             quantidade_var.set(self.quantidade_no())
 
+        def mostrar_no():
+
+            valor = int(caixa_entrada.get())
+            no_buscado = self.procurar(valor)
+            canvas.delete("all")
+            raiz = self.raiz
+            desenhar_no(raiz, 680, 50, 200, 100, no_buscado)
+            informacoes()
+
         # Função auxiliar para desenhar os nós da árvore
 
-        def desenhar_no(no, x, y, dx, dy):
+        def desenhar_no(no, x, y, dx, dy, no_buscado=None):
 
             raio = 18
-            cor = "white"
+            cor = "#f2f2f2"
+            cor_texto = "black"
+
             if no is not None:
                 espessura_borda = 2
+                if no_buscado == no:
+                    cor = "#ff4A4a"
+                    cor_texto = "#f2f2f2"
                 canvas.create_oval(x - raio, y - raio, x + raio,
                                    y + raio, fill=cor, width=espessura_borda)
-                canvas.create_text(x, y, text=(str(no.valor)), font='bold',)
+                canvas.create_text(x, y, text=(str(no.valor)),
+                                   font='bold', fill=cor_texto)
+
                 if no.esquerda:
                     canvas.create_line(x, y + raio, x - dx,
                                        y + dy - raio, width=2)
-                    desenhar_no(no.esquerda, x - dx, y + dy, dx/2, dy)
+                    desenhar_no(no.esquerda, x - dx, y +
+                                dy, dx/2, dy, no_buscado)
                 if no.direita:
                     canvas.create_line(x, y + raio, x + dx,
                                        y + dy - raio, width=2)
-                    desenhar_no(no.direita, x + dx, y + dy, dx/2, dy)
+                    desenhar_no(no.direita, x + dx, y +
+                                dy, dx/2, dy, no_buscado)
 
         raiz = self.raiz
 
         janela = tk.Tk()
-        janela.configure(bg='#3d3334')
+        janela.configure(bg='#0a0c0d')
         font_grande = font.Font(size=16)
         font_padrao = font.Font(size=15)
-
 
         altura_var = IntVar()
         maior_var = IntVar()
@@ -368,39 +339,41 @@ class Arvore:
         quantidade_var.set(0)
 
         titulo = tk.Label(janela, text='Árvore binária de busca balanceada',
-                          font=font_grande, fg='white', bg='#3d3334').pack(side='top')
+                          font=font_grande, fg='#f2f2f2', bg='#3d3334').pack(side='top')
 
         # Criação da janela e do canvas
-        canvas = tk.Canvas(janela, width=1350, height=800, bg="#386dbd")
+        canvas = tk.Canvas(janela, width=1350, height=800, bg="#348e91")
         canvas.pack(side='top')
 
         # Desenhar a árvore
         desenhar_no(raiz, 680, 50, 200, 100)
 
-        tex1 = tk.Label(janela, text='Altura da árvore: ', bg="#386dbd",
-                        font=font_padrao, fg="white").place(x=10, y=50)
-        altura = tk.Label(janela, textvariable=altura_var, bg="#386dbd",
-                          font=font_padrao, fg="white").place(x=160, y=50)
-        tex2 = tk.Label(janela, text='Maior valor: ', bg="#386dbd",
-                        font=font_padrao, fg="white").place(x=10, y=80)
-        maior = tk.Label(janela, textvariable=maior_var, bg="#386dbd",
-                         font=font_padrao, fg="white").place(x=130, y=80)
-        tex3 = tk.Label(janela, text='Menor valor: ', bg="#386dbd",
-                        font=font_padrao, fg="white").place(x=10, y=110)
-        menor = tk.Label(janela, textvariable=menor_var, bg="#386dbd",
-                         font=font_padrao, fg="white").place(x=130, y=110)
-        tex4 = tk.Label(janela, text='Quantidade de nó(s): ', bg="#386dbd",
-                        font=font_padrao, fg="white").place(x=10, y=140)
-        quantidade = tk.Label(janela, textvariable=quantidade_var, bg="#386dbd",
-                         font=font_padrao, fg="white").place(x=205, y=140)
+        tex1 = tk.Label(janela, text='Altura da árvore: ', bg="#348e91",
+                        font=font_padrao, fg="#f2f2f2").place(x=10, y=50)
+        altura = tk.Label(janela, textvariable=altura_var, bg="#348e91",
+                          font=font_padrao, fg="#f2f2f2").place(x=160, y=50)
+        tex2 = tk.Label(janela, text='Maior valor: ', bg="#348e91",
+                        font=font_padrao, fg="#f2f2f2").place(x=10, y=80)
+        maior = tk.Label(janela, textvariable=maior_var, bg="#348e91",
+                         font=font_padrao, fg="#f2f2f2").place(x=130, y=80)
+        tex3 = tk.Label(janela, text='Menor valor: ', bg="#348e91",
+                        font=font_padrao, fg="#f2f2f2").place(x=10, y=110)
+        menor = tk.Label(janela, textvariable=menor_var, bg="#348e91",
+                         font=font_padrao, fg="#f2f2f2").place(x=130, y=110)
+        tex4 = tk.Label(janela, text='Quantidade de nó(s): ', bg="#348e91",
+                        font=font_padrao, fg="#f2f2f2").place(x=10, y=140)
+        quantidade = tk.Label(janela, textvariable=quantidade_var, bg="#348e91",
+                              font=font_padrao, fg="#f2f2f2").place(x=205, y=140)
 
+        procurar = tk.Button(janela, text='Procurar', command=mostrar_no,
+                             bg='blue', fg='#f2f2f2', font=('Arial', 13), width=8).place(x=550, y=625)
         remover = tk.Button(janela, text='Remover', command=remover_arvore,
-                            bg='red', fg='white', font=('Arial', 13), width=8).place(x=599, y=625)
+                            bg='red', fg='#f2f2f2', font=('Arial', 13), width=8).place(x=638, y=625)
         adicionar = tk.Button(janela, text='Adicionar', command=adicionar_arvore,
-                              bg='green', fg='white', font=('Arial', 13)).place(x=687, y=625)
-        caixa_entrada = tk.Entry(janela, bg='white', font=(
-            'Arial', 16), justify='center', width=14)
-        caixa_entrada.place(x=599, y=590)
+                              bg='#1c5052', fg='#f2f2f2', font=('Arial', 13)).place(x=724, y=625)
+        caixa_entrada = tk.Entry(janela, bg='#f2f2f2', font=(
+            'Arial', 16), justify='center', width=21)
+        caixa_entrada.place(x=550, y=590)
 
     # Executar a janela
         janela.mainloop()
